@@ -150,10 +150,10 @@ const items = [
   <RouterView />
 </template>
 
-<style>
-/* @import "@/assets/base.css";
+<style lang="scss">
+@import "@scss/custom.module.scss";
 
-#app {
+/* #app {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
