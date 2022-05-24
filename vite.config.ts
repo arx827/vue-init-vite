@@ -2,8 +2,11 @@
 
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
+import AutoImport from 'unplugin-auto-import/vite';
+import Components from "unplugin-vue-components/vite";
+import { createSvgIconsPlugin } from "vite-plugin-svg-icons";
 
-import { resolve } from 'path';
+import path, { resolve } from 'path';
 
 function pathResolve(dir: string) {
   return resolve(__dirname, '.', dir)
@@ -12,7 +15,24 @@ function pathResolve(dir: string) {
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vue(),
+    AutoImport({
+      imports: ["vue", "vue-router", "vue-i18n"],
+      dts: "src/auto-imports.js",
+    }),
+    Components({
+      // 從 `./src/components/` 路徑查找
+      extensions: ["vue"],
+      include: [/\.vue$/, /\.vue\?vue/],
+      dts: "src/auto-components.js",
+    }),
+    createSvgIconsPlugin({
+      iconDirs: [path.resolve(process.cwd(), "src/assets/svg")],
+      symbolId: "[dir]/[name]",
+    }),
+
+  ],
   resolve: {
     alias: {
       '@': pathResolve('src'),
@@ -34,17 +54,17 @@ export default defineConfig({
   json: {
     stringify: true,  // 導入的JSON會被轉換為 export default JSON.parse(...)，當JSON文件較大的時候，性能更好
   },
-  server: {
-    port: 5000,
-    // open: '/index.html',  // 服務器啟動時，自動開啟
-    proxy: {
-      '/api': {
-        target: '',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
-      }
-    }
-  },
+  // server: {
+  //   port: 5000,
+  //   // open: '/index.html',  // 服務器啟動時，自動開啟
+  //   proxy: {
+  //     '/api': {
+  //       target: '',
+  //       changeOrigin: true,
+  //       rewrite: (path) => path.replace(/^\/api/, '')
+  //     }
+  //   }
+  // },
   build: {
     outDir: '/dist',
     rollupOptions: {
